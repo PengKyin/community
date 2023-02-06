@@ -141,6 +141,7 @@
                     });
                 });
             },
+
             findById(){
                 axios.get("/car/findById?id="+this.car.id).then((res)=>{
                     this.car = res.data.data;

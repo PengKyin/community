@@ -17,18 +17,7 @@ public class Parking implements Serializable {
     private Date createTime;
     private Date updateTime;
 
-    @Override
-    public String toString() {
-        return "Parking{" +
-                "id=" + id +
-                ", communityName='" + communityName + '\'' +
-                ", communityId=" + communityId +
-                ", status='" + status + '\'' +
-                ", code='" + code + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
+
 
     public Integer getId() {
         return id;
@@ -84,5 +73,17 @@ public class Parking implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+    @Override
+    public String toString() {
+        return "Parking{" +
+                "id=" + id +
+                ", communityName='" + communityName + '\'' +
+                ", communityId=" + communityId +
+                ", status='" + status + '\'' +
+                ", code='" + code + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
