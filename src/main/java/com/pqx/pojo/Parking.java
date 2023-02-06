@@ -10,12 +10,25 @@ public class Parking implements Serializable {
     @Id
     private Integer id;
 
-    private Integer communityId;
     private String communityName;
+    private Integer communityId;
     private String status;
     private String code;
     private Date createTime;
     private Date updateTime;
+
+    @Override
+    public String toString() {
+        return "Parking{" +
+                "id=" + id +
+                ", communityName='" + communityName + '\'' +
+                ", communityId=" + communityId +
+                ", status='" + status + '\'' +
+                ", code='" + code + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 
     public Integer getId() {
         return id;
@@ -25,20 +38,20 @@ public class Parking implements Serializable {
         this.id = id;
     }
 
-    public Integer getCommunityId() {
-        return communityId;
-    }
-
-    public void setCommunityId(Integer communityId) {
-        this.communityId = communityId;
-    }
-
     public String getCommunityName() {
         return communityName;
     }
 
     public void setCommunityName(String communityName) {
         this.communityName = communityName;
+    }
+
+    public Integer getCommunityId() {
+        return communityId;
+    }
+
+    public void setCommunityId(Integer communityId) {
+        this.communityId = communityId;
     }
 
     public String getStatus() {
@@ -71,18 +84,5 @@ public class Parking implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Parking{" +
-                "id=" + id +
-                ", communityId=" + communityId +
-                ", communityName='" + communityName + '\'' +
-                ", status='" + status + '\'' +
-                ", code='" + code + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
     }
 }
