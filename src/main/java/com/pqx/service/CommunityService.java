@@ -14,4 +14,5 @@ public interface CommunityService {
     public Boolean update(Community community);
     public Boolean updateStatus(String status, Integer id);
     public Boolean del(List<Integer> ids);
+    public List<String> getCommunityName();
 }

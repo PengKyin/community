@@ -2,9 +2,9 @@ package com.pqx.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.pqx.dao.CommunityMapper;
-import com.pqx.pojo.Community;
-import com.pqx.service.CommunityService;
+import com.pqx.dao.ActivityMapper;
+import com.pqx.pojo.Activity;
+import com.pqx.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -14,32 +14,31 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CommunityServiceImpl implements CommunityService {
-
+public class ActivityServiceImpl implements ActivityService {
     @Autowired
-    private CommunityMapper communityMapper;
+    private ActivityMapper activityMapper;
 
     @Override
-    public List<Community> findAll() {
-        List<Community> communities = communityMapper.selectAll();
-        return communities;
+    public List<Activity> findAll() {
+        List<Activity> activities = activityMapper.selectAll();
+        return activities;
     }
 
     @Override
-    public Page<Community> search(Map searchMap) {
-        Example example = new Example(Community.class);
+    public Page<Activity> search(Map searchMap) {
+        Example example = new Example(Activity.class);
         int pageNum = 1;
         int pageSize = 2;
         if (searchMap != null){
             Example.Criteria criteria = example.createCriteria();
             if (StringUtil.isNotEmpty((String) searchMap.get("startTime"))){
-                criteria.andGreaterThanOrEqualTo("createTime",searchMap.get("startTime"));
+                criteria.andGreaterThanOrEqualTo("startTime",searchMap.get("startTime"));
             }
             if (StringUtil.isNotEmpty((String) searchMap.get("endTime"))){
-                criteria.andLessThanOrEqualTo("createTime",searchMap.get("endTime"));
+                criteria.andLessThanOrEqualTo("startTime",searchMap.get("endTime"));
             }
-            if (StringUtil.isNotEmpty((String) searchMap.get("name"))){
-                criteria.andLike("name", "%"+(String) searchMap.get("name")+"%");
+            if (StringUtil.isNotEmpty((String) searchMap.get("title"))){
+                criteria.andLike("title", "%"+(String) searchMap.get("title")+"%");
             }
             if (searchMap.get("pageNum") != null){
                 pageNum = (Integer) searchMap.get("pageNum");
@@ -49,13 +48,13 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
         PageHelper.startPage(pageNum,pageSize);
-        Page<Community> communities = (Page<Community>) communityMapper.selectByExample(example);
-        return communities;
+        Page<Activity> activities = (Page<Activity>) activityMapper.selectByExample(example);
+        return activities;
     }
 
     @Override
-    public Boolean add(Community community) {
-        int row = communityMapper.insert(community);
+    public Boolean add(Activity activity) {
+        int row = activityMapper.insert(activity);
         if (row > 0){
             return true;
         }else {
@@ -64,13 +63,13 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community findById(Integer id) {
-        return communityMapper.selectByPrimaryKey(id);
+    public Activity findById(Integer id) {
+        return activityMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public Boolean update(Community community) {
-        int row = communityMapper.updateByPrimaryKeySelective(community);
+    public Boolean update(Activity activity) {
+        int row = activityMapper.updateByPrimaryKeySelective(activity);
         if (row > 0){
             return true;
         }else {
@@ -80,10 +79,9 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Boolean updateStatus(String status, Integer id) {
-        Community community = new Community();
-        community.setId(id);
-        community.setStatus(status);
-        int row = communityMapper.updateByPrimaryKeySelective(community);
+        Activity activity = new Activity();
+        activity.setId(id);
+        int row = activityMapper.updateByPrimaryKeySelective(activity);
         if (row > 0){
             return true;
         }else {
@@ -94,13 +92,9 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public Boolean del(List<Integer> ids) {
         for(Integer id:ids){
-            communityMapper.deleteByPrimaryKey(id);
+            activityMapper.deleteByPrimaryKey(id);
         }
         return true;
     }
 
-    @Override
-    public List<String> getCommunityName() {
-        return communityMapper.getCommunityName();
-    }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        楼栋管理
+        投诉
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -16,34 +16,51 @@
     <!-- 引入ElementUI样式 -->
     <link rel="stylesheet" href="/css/index.css">
 </head>
-
 <body>
 <div id="app">
 <div class="x-nav">
             <span class="layui-breadcrumb">
               <a><cite>首页</cite></a>
-              <a><cite>楼栋管理</cite></a>
+              <a><cite>服务管理</cite></a>
               <a><cite>{{title}}</cite></a>
             </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
 </div>
 <div class="x-body">
-    <el-form :model="building" :rules="rules" ref="buildingFormRef" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="所属小区" prop="communityName">
-            <el-input v-model="building.communityName"></el-input>
+    <el-form :model="complaint" :rules="rules" ref="communityFormRef" label-width="120px" class="demo-ruleForm">
+
+        <el-form-item label="所属小区">
+            <el-select v-model="complaint.communityName" clearable placeholder="请选择小区">
+                <el-option
+                        v-for="item in options1"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+            </el-select>
         </el-form-item>
-        <el-form-item label="楼栋编号" prop="communityId">
-            <el-input v-model="building.communityId"></el-input>
+
+        <el-form-item label="投诉人员" prop="ownerName">
+            <el-input v-model="complaint.ownerName"></el-input>
         </el-form-item>
-        <el-form-item label="楼栋名称" prop="name">
-            <el-input v-model="building.name"></el-input>
+
+        <el-form-item label="投诉事由" prop="reason">
+            <el-input v-model="complaint.reason"></el-input>
         </el-form-item>
-        <el-form-item label="总户数" prop="totalHouseholds">
-            <el-input v-model="building.totalHouseholds"></el-input>
+
+        <el-form-item label="投诉详情" prop="description">
+            <el-input v-model="complaint.description"></el-input>
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-            <el-input v-model="building.description"></el-input>
+
+        <el-form-item label="状态" prop="status">
+            <el-radio-group v-model="complaint.status">
+                <el-radio label="0">待受理</el-radio>
+                <el-radio v-if="complaint.id!=null" label="1">已受理</el-radio>
+                <el-radio v-if="complaint.id!=null" label="2">已处理完毕</el-radio>
+            </el-radio-group>
         </el-form-item>
+
+
         <el-form-item>
             <el-button type="primary" @click="save()" style="text-align: center">保存</el-button>
             <el-button @click="clearAll()" style="text-align: center">重置</el-button>
@@ -63,75 +80,64 @@
     var app = new Vue({
         el:"#app",
         data:{
-            title:"添加楼栋",
-            building:{id:""},
+            title:"添加投诉",
+            complaint:{id:""},
             fileList:[],
+            options1: [],
             rules: {
                 name: [
-                    { required: true, message: '请输入楼栋名称', trigger: 'blur' },
-                    { max: 50, message: '长度小于50个字符', trigger: 'blur' }
-                ],
-                communityName: [
                     { required: true, message: '请输入小区名称', trigger: 'blur' },
                     { max: 50, message: '长度小于50个字符', trigger: 'blur' }
                 ],
-                communityId: [
-                    { required: true, message: '请输入楼栋编号', trigger: 'blur' },
-                    // { min: 11,max: 20, message: '长度必须大于11、小于20个字符', trigger: 'blur' }
-                ],
-                address: [
-                    { required: true, message: '请输入小区地址', trigger: 'blur' }
-                ],
-                area: [
-                    { required: true, message: '请输入占地面积', trigger: 'blur' }
-                ],
-                developer: [
-                    { required: true, message: '请输入开发商名称', trigger: 'blur' }
-                ],
-                estateCompany: [
-                    { required: true, message: '请输入物业公司名称', trigger: 'blur' }
-                ],
-                greeningRate: [
-                    { required: true, message: '请输入绿化面积', trigger: 'blur' },
-                ],
-                totalBuildings:[
-                    { required: true, message: '请输入楼栋总数', trigger: 'blur' }
-                ],
-                totalHouseholds:[
-                    { required: true, message: '请输入住户总数', trigger: 'blur' }
-                ],
+
+                // status:[
+                //     { required: true, message: '请选择小区状态', trigger: 'change' }
+                // ],
             }
         },
+        mounted() {
+            this.getOptionsList();
+        },
         methods:{
-            //日期格式化方法
-            //date 要进行格式的日期 ；format 格式化的样式
-            dateFormat(date,format){
-                //默认格式化字符串"YYYY-MM-DD HH:mm:ss"
-                if(format == null || format == ''){
-                    format = "YYYY-MM-DD HH:mm:ss";
-                }
-                return moment(date).format(format);
+            getOptionsList() {
+                axios.get("/parking/getCommunityName").then((res)=>{
+                    let result = res.data.data;
+                    result.forEach(element => {
+                        this.options1.push({label:element,value:element})
+                    });
+                });
             },
             findById(){
-                axios.get("/building/findById?id="+this.building.id).then((res)=>{
-                    this.building = res.data.data;
+                axios.get("/complaint/findById?id="+this.complaint.id).then((res)=>{
+                    this.complaint = res.data.data;
                 });
+            },
+
+            handlePreview(file) {
+                console.log(file);
+            },
+            handleExceed(files, fileList) {
+                this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            },
+            //文件删除提示
+            beforeRemove(file, fileList) {
+                return this.$confirm(`确定移除 ${ file.name }？`);
             },
             //表达重置
             clearAll() {
-                this.$refs.buildingFormRef.resetFields();
+                this.$refs.communityFormRef.resetFields();
                 if(this.fileList.length>0) {
                     this.handleRemove();
                 }
             },
             save(){
                 var method = "";
-                if(this.building.id != null){
+                if(this.complaint.id != null){
                     method = "update"
                 }else{
                     method = "add"
                 }
-                axios.post("/building/"+method,this.building).then((res)=>{
+                axios.post("/complaint/"+method,this.complaint).then((res)=>{
                     if(res.data.flag){
                         this.$message({
                             message: res.data.message,
@@ -155,10 +161,10 @@
                 okLoading.close($);
             });
             //获取父页面传递参数，小区ID
-            this.building.id = this.getQueryString("id");
+            this.complaint.id = this.getQueryString("id");
             //根据小区ID获取小区对象，进行数据回显
-            if(this.building.id != null && this.building.id != ''){
-                this.title="修改楼栋";
+            if(this.complaint.id != null && this.complaint.id != ''){
+                this.title="修改投诉";
                 this.findById();
             }
         }

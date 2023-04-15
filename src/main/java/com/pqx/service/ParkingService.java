@@ -1,11 +1,7 @@
 package com.pqx.service;
 
 import com.github.pagehelper.Page;
-import com.pqx.pojo.Community;
-import com.pqx.pojo.Owner;
 import com.pqx.pojo.Parking;
-
-import javax.servlet.http.PushBuilder;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +15,6 @@ public interface ParkingService {
     public Boolean del(List<Integer> ids);
     public List<String> getCommunityName();
     public Integer getCommunityId(String communityName);
+    public Boolean updateByCode(String status,String code);
 
 }

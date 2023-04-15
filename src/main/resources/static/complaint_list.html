@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        活动管理
+        投诉管理
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -30,8 +30,8 @@
 <div class="x-nav">
             <span class="layui-breadcrumb">
               <a><cite>首页</cite></a>
-              <a><cite>活动管理</cite></a>
-              <a><cite>活动列表</cite></a>
+              <a><cite>服务管理</cite></a>
+              <a><cite>投诉列表</cite></a>
             </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
 </div>
@@ -47,45 +47,39 @@
                 end-placeholder="结束日期"
                 :picker-options="pickerOptions">
         </el-date-picker>
-        <span class="demonstration">搜索关键字：</span>
-        <el-input v-model="searchMap.title" style="width: 20%" placeholder="请输入活动名称"></el-input>
+        <span style="margin-left: 5px" class="demonstration">搜索关键字：</span>
+        <el-input v-model="searchMap.reason" style="width: 20%" placeholder="请输入投诉事由"></el-input>
         <el-button type="primary" plain @click="searchMap.pageNum=1;search()">搜索</el-button>
     </div>
     <br>
     <xblock>
         <button class="layui-btn layui-btn-danger" @click="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button>
-        <button class="layui-btn" @click="admin_add('添加','activity_add.html','1000','600')"><i class="layui-icon">&#xe608;</i>添加</button>
+        <button class="layui-btn" @click="admin_add('添加','complaint_add.html','1000','600')"><i class="layui-icon">&#xe608;</i>添加</button>
         <!-- <span class="x-right" style="line-height:40px">共有数据：<span class="layui-badge">2</span> 条</span> -->
     </xblock>
     <table class="layui-table">
         <thead>
         <tr>
             <th>
-                <input type="checkbox" id="allChecked" :checked="checkedIDs.length===activityList.length" @click="allChecked">
+                <input type="checkbox" id="allChecked" :checked="checkedIDs.length===complainList.length" @click="allChecked">
             </th>
             <th>
                 所属小区
             </th>
             <th>
-                活动标题
+                投诉人员
             </th>
             <th>
-                活动地点
+                投诉事由
             </th>
             <th>
-                举办单位
+                投诉详情
             </th>
             <th>
-                活动开始时间
-            </th>
-            <th>
-                活动截止时间
+                投诉状态
             </th>
             <th>
                 创建时间
-            </th>
-            <th>
-                状态
             </th>
             <th>
                 操作
@@ -93,28 +87,26 @@
         </tr>
         </thead>
         <tbody id="x-img">
-        <tr v-for="(activity,index) in activityList">
+        <tr v-for="(complain,index) in complainList">
             <td>
-                <input type="checkbox" :id="'id'+activity.id" :value="activity.id" v-model="checkedIDs">
+                <input type="checkbox" :id="'id'+complain.id" :value="complain.id" v-model="checkedIDs">
             </td>
-            <td>{{activity.communityName}}</td>
-            <td>{{activity.title}}</td>
-            <td>{{activity.address}}</td>
-            <td>{{activity.organizer}}</td>
-            <td>{{dateFormat(activity.startTime)}}</td>
-            <td>{{dateFormat(activity.endTime)}}</td>
-            <td>{{dateFormat(activity.createTime)}}</td>
+            <td>{{complain.communityName}}</td>
+            <td>{{complain.ownerName}}</td>
+            <td>{{complain.reason}}</td>
+            <td>{{complain.description}}</td>
             <td>
-                <el-button type="info" round v-if="activity.status == 0">未开始</el-button>
-                <el-button type="success" round v-if="activity.status == 1">进行中</el-button>
-                <el-button type="danger" round v-if="activity.status == 2">已结束</el-button>
+                <el-button type="danger" round v-if="complain.status == 0">待受理</el-button>
+                <el-button type="info" round v-if="complain.status == 1">已受理</el-button>
+                <el-button type="success" round v-if="complain.status == 2">已处理完毕</el-button>
             </td>
+            <td>{{dateFormat(complain.createTime)}}</td>
             <td class="td-manage">
-                <a title="编辑" href="javascript:;" @click="activity_edit('编辑','activity_add.html',activity.id,'1000','600')"
+                <a title="编辑" href="javascript:;" @click="repair_edit('编辑','complaint_add.html',complain.id,'1000','600')"
                    class="ml-5" style="text-decoration:none">
                     <i class="layui-icon">&#xe642;</i>
                 </a>
-                <a title="删除" href="javascript:;" @click="del_one(activity.id)"
+                <a title="删除" href="javascript:;" @click="del_one(complain.id)"
                    style="text-decoration:none">
                     <i class="layui-icon">&#xe640;</i>
                 </a>
@@ -150,9 +142,9 @@
         data:{
             currentPage:[''],
             checkedIDs:[],
-            activityList:[],
+            complainList:[],
             total:10,
-            searchMap:{"startTime":"","endTime":"","title":"","pageNum":1,"pageSize":2},
+            searchMap:{"startTime":"","endTime":"","reason":"","pageNum":1,"pageSize":2},
             selectDate:['',''],
             pickerOptions: {
                 shortcuts: [{
@@ -185,14 +177,14 @@
         methods:{
             //分页条件查询小区列表
             search(){
-                axios.post("/activity/search",this.searchMap).then((res)=>{
-                    app.activityList = res.data.data;
+                axios.post("/complaint/search",this.searchMap).then((res)=>{
+                    app.complainList = res.data.data;
                     app.total = res.data.total;
                 });
             },
             //单个删除
             del_one(id){
-                this.$confirm('请问您是否要删除该活动信息?', '提示', {
+                this.$confirm('请问您是否要删除该投诉信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -200,7 +192,7 @@
                     //把选中的ID封装到集合中
                     this.checkedIDs.push(id);
                     //执行删除操作
-                    axios.post("/activity/del",this.checkedIDs).then((res)=>{
+                    axios.post("/complaint/del",this.checkedIDs).then((res)=>{
                         if(res.data.flag){
                             this.$message({
                                 type: 'success',
@@ -224,13 +216,13 @@
             },
             //多选删除
             delAll(){
-                this.$confirm('请问您是否要删除选中活动信息?', '提示', {
+                this.$confirm('请问您是否要删除选中投诉信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     //执行删除操作
-                    axios.post("/activity/del",this.checkedIDs).then((res)=>{
+                    axios.post("/complaint/del",this.checkedIDs).then((res)=>{
                         if(res.data.flag){
                             this.$message({
                                 type: 'success',
@@ -253,14 +245,14 @@
             },
             //全选、全不选方法
             allChecked: function () {
-                if (this.checkedIDs.length === this.activityList.length) {
+                if (this.checkedIDs.length === this.complainList.length) {
                     // 全不选
                     this.checkedIDs = [];
 
                 } else {
                     this.checkedIDs = [];
                     // 全选
-                    this.activityList.forEach( (item) =>{
+                    this.complainList.forEach( (item) =>{
                         this.checkedIDs.push(item.id); // 与checkbox的value统一
                     })
                 }
@@ -307,7 +299,7 @@
                 this.x_admin_show(title,url,w,h);
             },
             //编辑
-            activity_edit(title,url,id,w,h) {
+            repair_edit(title,url,id,w,h) {
                 url = url+"?id="+id;
                 this.x_admin_show(title,url,w,h);
             },

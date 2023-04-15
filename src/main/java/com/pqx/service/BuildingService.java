@@ -19,4 +19,8 @@ public interface BuildingService {
     public Boolean update(Building building);
 
     Boolean del(List<Integer> ids);
+
+    public List<String> getBuildingName(String communityName);
+
+    public Integer getBuildingId(String buildingName);
 }

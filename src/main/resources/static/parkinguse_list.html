@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        活动管理
+        车位使用管理
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -17,6 +17,7 @@
     <!--导入ElementUI样式列表，css样式一般都在页面头部-->
     <link rel="stylesheet" href="/css/index.css">
 </head>
+<body>
 <style>
     html,
     body,
@@ -26,12 +27,11 @@
         overflow: scroll;
     }
 </style>
-<body>
 <div class="x-nav">
             <span class="layui-breadcrumb">
               <a><cite>首页</cite></a>
-              <a><cite>活动管理</cite></a>
-              <a><cite>活动列表</cite></a>
+              <a><cite>车位使用管理</cite></a>
+              <a><cite>车位使用列表</cite></a>
             </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
 </div>
@@ -48,44 +48,46 @@
                 :picker-options="pickerOptions">
         </el-date-picker>
         <span class="demonstration">搜索关键字：</span>
-        <el-input v-model="searchMap.title" style="width: 20%" placeholder="请输入活动名称"></el-input>
+        <el-input v-model="searchMap.carNumber" style="width: 20%" placeholder="请输入车牌号"></el-input>
         <el-button type="primary" plain @click="searchMap.pageNum=1;search()">搜索</el-button>
     </div>
     <br>
     <xblock>
         <button class="layui-btn layui-btn-danger" @click="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button>
-        <button class="layui-btn" @click="admin_add('添加','activity_add.html','1000','600')"><i class="layui-icon">&#xe608;</i>添加</button>
-        <!-- <span class="x-right" style="line-height:40px">共有数据：<span class="layui-badge">2</span> 条</span> -->
+        <button class="layui-btn" @click="admin_add('添加','parkinguse_add.html','1000','600')"><i class="layui-icon">&#xe608;</i>添加</button>
     </xblock>
     <table class="layui-table">
         <thead>
         <tr>
             <th>
-                <input type="checkbox" id="allChecked" :checked="checkedIDs.length===activityList.length" @click="allChecked">
+                <input type="checkbox" id="allChecked" :checked="checkedIDs.length===parkinguseList.length" @click="allChecked">
             </th>
             <th>
                 所属小区
             </th>
             <th>
-                活动标题
+                车位编号
             </th>
             <th>
-                活动地点
+                车牌号码
             </th>
             <th>
-                举办单位
+                车辆所有人
             </th>
             <th>
-                活动开始时间
+                联系方式
             </th>
             <th>
-                活动截止时间
+                使用性质
             </th>
             <th>
-                创建时间
+                总费用
             </th>
             <th>
-                状态
+                开始时间
+            </th>
+            <th>
+                截止时间
             </th>
             <th>
                 操作
@@ -93,28 +95,31 @@
         </tr>
         </thead>
         <tbody id="x-img">
-        <tr v-for="(activity,index) in activityList">
+        <tr v-for="(parkinguse,index) in parkinguseList">
             <td>
-                <input type="checkbox" :id="'id'+activity.id" :value="activity.id" v-model="checkedIDs">
+                <input type="checkbox" :id="'id'+parkinguse.id" :value="parkinguse.id" v-model="checkedIDs">
             </td>
-            <td>{{activity.communityName}}</td>
-            <td>{{activity.title}}</td>
-            <td>{{activity.address}}</td>
-            <td>{{activity.organizer}}</td>
-            <td>{{dateFormat(activity.startTime)}}</td>
-            <td>{{dateFormat(activity.endTime)}}</td>
-            <td>{{dateFormat(activity.createTime)}}</td>
+
+            <td>{{parkinguse.communityName}}</td>
+            <td>{{parkinguse.code}}</td>
+            <td>{{parkinguse.carNumber}}</td>
+            <td>{{parkinguse.ownerName}}</td>
+            <td>{{parkinguse.telephone}}</td>
             <td>
-                <el-button type="info" round v-if="activity.status == 0">未开始</el-button>
-                <el-button type="success" round v-if="activity.status == 1">进行中</el-button>
-                <el-button type="danger" round v-if="activity.status == 2">已结束</el-button>
+                <el-button type="info" round v-if="parkinguse.useType == 0">购买</el-button>
+                <el-button type="info" round v-if="parkinguse.useType == 1">月租</el-button>
+                <el-button type="info" round v-if="parkinguse.useType == 2">年租</el-button>
             </td>
+            <td>{{parkinguse.totalFee}}</td>
+            <td>{{dateFormat(parkinguse.startTime)}}</td>
+            <td>{{dateFormat(parkinguse.endTime)}}</td>
+
             <td class="td-manage">
-                <a title="编辑" href="javascript:;" @click="activity_edit('编辑','activity_add.html',activity.id,'1000','600')"
+                <a title="编辑" href="javascript:;" @click="community_edit('编辑','parkingusage_add.html',parkinguse.id,'1000','600')"
                    class="ml-5" style="text-decoration:none">
                     <i class="layui-icon">&#xe642;</i>
                 </a>
-                <a title="删除" href="javascript:;" @click="del_one(activity.id)"
+                <a title="删除" href="javascript:;" @click="del_one(parkinguse.id)"
                    style="text-decoration:none">
                     <i class="layui-icon">&#xe640;</i>
                 </a>
@@ -128,7 +133,7 @@
             @current-change="handleCurrentChange"
             :page-size="searchMap.pageSize"
             layout="prev, pager, next,sizes"
-            :page-sizes="[2,5,10]"
+            :page-sizes="[2,10,20]"
             style="text-align: right;"
             :current-page="currentPage"
             :total="total">
@@ -150,9 +155,9 @@
         data:{
             currentPage:[''],
             checkedIDs:[],
-            activityList:[],
+            parkinguseList:[],
             total:10,
-            searchMap:{"startTime":"","endTime":"","title":"","pageNum":1,"pageSize":2},
+            searchMap:{"startTime":"","endTime":"","communityName":"","pageNum":1,"pageSize":2},
             selectDate:['',''],
             pickerOptions: {
                 shortcuts: [{
@@ -185,14 +190,14 @@
         methods:{
             //分页条件查询小区列表
             search(){
-                axios.post("/activity/search",this.searchMap).then((res)=>{
-                    app.activityList = res.data.data;
+                axios.post("/parkinguse/search",this.searchMap).then((res)=>{
+                    app.parkinguseList = res.data.data;
                     app.total = res.data.total;
                 });
             },
             //单个删除
             del_one(id){
-                this.$confirm('请问您是否要删除该活动信息?', '提示', {
+                this.$confirm('请问您是否要删除该车位信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -200,7 +205,7 @@
                     //把选中的ID封装到集合中
                     this.checkedIDs.push(id);
                     //执行删除操作
-                    axios.post("/activity/del",this.checkedIDs).then((res)=>{
+                    axios.post("/parkinguse/del",this.checkedIDs).then((res)=>{
                         if(res.data.flag){
                             this.$message({
                                 type: 'success',
@@ -224,13 +229,13 @@
             },
             //多选删除
             delAll(){
-                this.$confirm('请问您是否要删除选中活动信息?', '提示', {
+                this.$confirm('请问您是否要删除选中车位信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     //执行删除操作
-                    axios.post("/activity/del",this.checkedIDs).then((res)=>{
+                    axios.post("/parkinguse/del",this.checkedIDs).then((res)=>{
                         if(res.data.flag){
                             this.$message({
                                 type: 'success',
@@ -253,14 +258,14 @@
             },
             //全选、全不选方法
             allChecked: function () {
-                if (this.checkedIDs.length === this.activityList.length) {
+                if (this.checkedIDs.length === this.parkinguseList.length) {
                     // 全不选
                     this.checkedIDs = [];
 
                 } else {
                     this.checkedIDs = [];
                     // 全选
-                    this.activityList.forEach( (item) =>{
+                    this.parkinguseList.forEach( (item) =>{
                         this.checkedIDs.push(item.id); // 与checkbox的value统一
                     })
                 }
@@ -306,8 +311,9 @@
             admin_add(title,url,w,h){
                 this.x_admin_show(title,url,w,h);
             },
+
             //编辑
-            activity_edit(title,url,id,w,h) {
+            community_edit (title,url,id,w,h) {
                 url = url+"?id="+id;
                 this.x_admin_show(title,url,w,h);
             },

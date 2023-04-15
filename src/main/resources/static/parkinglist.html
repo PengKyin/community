@@ -95,8 +95,11 @@
             <td>{{dateFormat(parking.createTime)}}</td>
 
             <td class="td-status">
-                <span :class="parking.status == 0?'layui-btn layui-btn-normal':'layui-btn layui-btn-disabled'">
-                    {{parking.status == 0?'启用':'停用'}}
+<!--                <span :class="parking.status == 0?'layui-btn layui-btn-normal':'layui-btn layui-btn-disabled'">-->
+<!--                    {{parking.status == 0?'启用':'停用'}}-->
+                <span>
+                    <el-button v-if="parking.status == 0" type="success" round>已启用</el-button>
+                    <el-button v-if="parking.status == 1" type="danger" round>停用</el-button>
                 </span>
             </td>
 

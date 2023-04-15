@@ -105,4 +105,14 @@ public class BuildingServiceImpl implements BuildingService {
         }
         return true;
     }
+
+    @Override
+    public List<String> getBuildingName(String communityName) {
+        return buildingMapper.getBuildingName(communityName);
+    }
+
+    @Override
+    public Integer getBuildingId(String buildingName) {
+        return buildingMapper.getBuildingId(buildingName);
+    }
 }

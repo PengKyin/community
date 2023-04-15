@@ -2,9 +2,9 @@ package com.pqx.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.pqx.dao.CommunityMapper;
-import com.pqx.pojo.Community;
-import com.pqx.service.CommunityService;
+import com.pqx.dao.DeviceMapper;
+import com.pqx.pojo.Device;
+import com.pqx.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -14,20 +14,19 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CommunityServiceImpl implements CommunityService {
-
+public class DeviceServiceImpl implements DeviceService {
     @Autowired
-    private CommunityMapper communityMapper;
+    private DeviceMapper deviceMapper;
 
     @Override
-    public List<Community> findAll() {
-        List<Community> communities = communityMapper.selectAll();
-        return communities;
+    public List<Device> findAll() {
+        List<Device> devices = deviceMapper.selectAll();
+        return devices;
     }
 
     @Override
-    public Page<Community> search(Map searchMap) {
-        Example example = new Example(Community.class);
+    public Page<Device> search(Map searchMap) {
+        Example example = new Example(Device.class);
         int pageNum = 1;
         int pageSize = 2;
         if (searchMap != null){
@@ -49,13 +48,13 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
         PageHelper.startPage(pageNum,pageSize);
-        Page<Community> communities = (Page<Community>) communityMapper.selectByExample(example);
-        return communities;
+        Page<Device> devices = (Page<Device>) deviceMapper.selectByExample(example);
+        return devices;
     }
 
     @Override
-    public Boolean add(Community community) {
-        int row = communityMapper.insert(community);
+    public Boolean add(Device device) {
+        int row = deviceMapper.insert(device);
         if (row > 0){
             return true;
         }else {
@@ -64,13 +63,13 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community findById(Integer id) {
-        return communityMapper.selectByPrimaryKey(id);
+    public Device findById(Integer id) {
+        return deviceMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public Boolean update(Community community) {
-        int row = communityMapper.updateByPrimaryKeySelective(community);
+    public Boolean update(Device device) {
+        int row = deviceMapper.updateByPrimaryKeySelective(device);
         if (row > 0){
             return true;
         }else {
@@ -78,29 +77,12 @@ public class CommunityServiceImpl implements CommunityService {
         }
     }
 
-    @Override
-    public Boolean updateStatus(String status, Integer id) {
-        Community community = new Community();
-        community.setId(id);
-        community.setStatus(status);
-        int row = communityMapper.updateByPrimaryKeySelective(community);
-        if (row > 0){
-            return true;
-        }else {
-            return false;
-        }
-    }
 
     @Override
     public Boolean del(List<Integer> ids) {
         for(Integer id:ids){
-            communityMapper.deleteByPrimaryKey(id);
+            deviceMapper.deleteByPrimaryKey(id);
         }
         return true;
-    }
-
-    @Override
-    public List<String> getCommunityName() {
-        return communityMapper.getCommunityName();
     }
 }

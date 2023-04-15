@@ -2,9 +2,10 @@ package com.pqx.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.pqx.dao.CommunityMapper;
+import com.pqx.dao.RepairMapper;
 import com.pqx.pojo.Community;
-import com.pqx.service.CommunityService;
+import com.pqx.pojo.Repair;
+import com.pqx.service.RepairService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -14,20 +15,19 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CommunityServiceImpl implements CommunityService {
-
+public class RepairServiceImpl implements RepairService {
     @Autowired
-    private CommunityMapper communityMapper;
+    private RepairMapper repairMapper;
 
     @Override
-    public List<Community> findAll() {
-        List<Community> communities = communityMapper.selectAll();
-        return communities;
+    public List<Repair> findAll() {
+        List<Repair> repairs = repairMapper.selectAll();
+        return repairs;
     }
 
     @Override
-    public Page<Community> search(Map searchMap) {
-        Example example = new Example(Community.class);
+    public Page<Repair> search(Map searchMap) {
+        Example example = new Example(Repair.class);
         int pageNum = 1;
         int pageSize = 2;
         if (searchMap != null){
@@ -38,8 +38,8 @@ public class CommunityServiceImpl implements CommunityService {
             if (StringUtil.isNotEmpty((String) searchMap.get("endTime"))){
                 criteria.andLessThanOrEqualTo("createTime",searchMap.get("endTime"));
             }
-            if (StringUtil.isNotEmpty((String) searchMap.get("name"))){
-                criteria.andLike("name", "%"+(String) searchMap.get("name")+"%");
+            if (StringUtil.isNotEmpty((String) searchMap.get("deviceName"))){
+                criteria.andLike("deviceName", "%"+(String) searchMap.get("deviceName")+"%");
             }
             if (searchMap.get("pageNum") != null){
                 pageNum = (Integer) searchMap.get("pageNum");
@@ -49,13 +49,13 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
         PageHelper.startPage(pageNum,pageSize);
-        Page<Community> communities = (Page<Community>) communityMapper.selectByExample(example);
-        return communities;
+        Page<Repair> repairs = (Page<Repair>) repairMapper.selectByExample(example);
+        return repairs;
     }
 
     @Override
-    public Boolean add(Community community) {
-        int row = communityMapper.insert(community);
+    public Boolean add(Repair repair) {
+        int row = repairMapper.insert(repair);
         if (row > 0){
             return true;
         }else {
@@ -64,13 +64,13 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Community findById(Integer id) {
-        return communityMapper.selectByPrimaryKey(id);
+    public Repair findById(Integer id) {
+        return repairMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public Boolean update(Community community) {
-        int row = communityMapper.updateByPrimaryKeySelective(community);
+    public Boolean update(Repair repair) {
+        int row = repairMapper.updateByPrimaryKeySelective(repair);
         if (row > 0){
             return true;
         }else {
@@ -80,10 +80,10 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Boolean updateStatus(String status, Integer id) {
-        Community community = new Community();
-        community.setId(id);
-        community.setStatus(status);
-        int row = communityMapper.updateByPrimaryKeySelective(community);
+        Repair repair = new Repair();
+        repair.setId(id);
+        repair.setStatus(status);
+        int row = repairMapper.updateByPrimaryKeySelective(repair);
         if (row > 0){
             return true;
         }else {
@@ -94,13 +94,8 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public Boolean del(List<Integer> ids) {
         for(Integer id:ids){
-            communityMapper.deleteByPrimaryKey(id);
+            repairMapper.deleteByPrimaryKey(id);
         }
         return true;
-    }
-
-    @Override
-    public List<String> getCommunityName() {
-        return communityMapper.getCommunityName();
     }
 }

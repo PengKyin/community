@@ -108,4 +108,9 @@ public class ParkingServiceImpl implements ParkingService {
     public Integer getCommunityId(String communityName) {
        return parkingMapper.getCommunityId(communityName);
     }
+
+    @Override
+    public Boolean updateByCode(String status, String code) {
+        return parkingMapper.updateByCode(status,code);
+    }
 }
