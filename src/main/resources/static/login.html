@@ -78,24 +78,25 @@
   <label style="margin-left: 180px;color: white">——高尔基</label>
 </div>
 <div id="app">
-<form id="login_form" class="form-horizontal">
+<form id="login_form"  class="form-horizontal">
   <div style="margin-left: 10px" class="form-group">
     <label style="margin-top: 3px" for="inputEmail3" class="col-sm-2 control-label">Username</label>
     <div class="col-sm-10">
-      <input style="margin-top: 10px" required  oninvalid="this.setCustomValidity('用户名不能为空')" oninput="setCustomValidity('')" name="username" type="text" class="form-control" id="inputEmail3" placeholder="用户名">
+      <input style="margin-top: 10px" required  oninvalid="this.setCustomValidity('用户名不能为空')" oninput="setCustomValidity('')"
+             v-model="loginForm.username" name="username" type="text" class="form-control" id="inputEmail3" placeholder="用户名">
     </div>
   </div>
   <div style="margin-left: 10px" class="form-group">
     <label style="margin-top: 3px" for="inputPassword3" class="col-sm-2 control-label">Password</label>
     <div class="col-sm-10">
-      <input style="margin-top: 5px" required oninvalid="this.setCustomValidity('密码不能为空')" oninput="setCustomValidity('')" name="password" type="password" class="form-control" id="inputPassword3" placeholder="密码">
+      <input style="margin-top: 5px" required oninvalid="this.setCustomValidity('密码不能为空')" oninput="setCustomValidity('')"
+             v-model="loginForm.password" name="password" type="password" class="form-control" id="inputPassword3" placeholder="密码">
     </div>
   </div>
 
   <div class="form-group">
     <div  class="col-sm-offset-2 col-sm-10">
-      <a href="welcome.html"></a>
-      <button type="submit" class="btn btn-default" id="login" @click="onSubmit()">Sign in</button>
+      <button type="button" class="btn btn-default" id="login" @click="onSubmit()">Sign in</button>
 <!--      <strong style="color: red">${login_msg}</strong>-->
     </div>
   </div>
@@ -103,11 +104,8 @@
 </div>
 <!--Vue js脚本-->
 <script src="/js/vue.js" charset="utf-8"></script>
-<script>
-  let login=document.querySelector('.btn');
-  login.onclick=function (){
-  }
-</script>
+<!--引入Axios js脚本-->
+<script src="/js/axios.js" charset="utf-8"></script>
 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
@@ -116,11 +114,23 @@
 <script>
   var app = new Vue({
     el:"#app",
+    data(){
+      return{
+        loginForm:{
+          "username":"",
+          "password":""
+        },
+      }
+    },
     methods:{
       onSubmit(){
-        alert("lalal")
-      }
-    }
+        axios.post("/user/login",this.loginForm).then((res)=>{
+          if (res.data.flag){
+            window.location.href="index.html"
+          }
+        });
+      },
+    },
   })
 </script>
 </body>
